@@ -6,6 +6,7 @@
 * [Valid emails](#Valid-emails)
 * [RoadRecon](#ROADRecon)
 * [AzureBound](#AzureBound)
+* [PowerZure](#PowerZure)
 
 ### Manually
 #### Get if tenant is in use and if fedaration is in use.
