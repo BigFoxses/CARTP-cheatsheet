@@ -1,0 +1,19 @@
+Console
+Return All Azure Users
+MATCH (n:AZUser) return n.name
+Return All Azure Applications
+MATCH (n:AZApp) return n.objectid
+Return All Azure Devices
+MATCH (n:AZDevice) return n.name
+Return All Azure Groups
+MATCH (n:AZGroup) return n.name
+Return all Azure Key Vaults
+MATCH (n:AZKeyVault) return n.name
+Return all Azure Resource Groups
+MATCH (n:AZResourceGroup) return n.name
+Return all Azure Service Principals
+MATCH (n:AZServicePrincipal) return n.objectid
+Return all Azure Virtual Machines
+MATCH (n:AZVM) return n.name
+Find All Principals with the ‘Contributor’ role
+MATCH p = (n)-[r:AZContributor]->(g) RETURN p
