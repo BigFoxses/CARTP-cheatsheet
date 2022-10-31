@@ -226,6 +226,10 @@ Connect-AzureAD -Credential $creds
 
 Get-AzureADMSRoleDefinition | ?{$_.IsBuiltin -eq $False} | select DisplayName
 ```
+```
+$a = Get-AzureADMSRoleDefinition | Where-object {$_.DisplayName -eq 'Company Administrator'}
+$a.RolePermissions.AllowResourceActions
+```
 
 ### Devices enumeration
 #### Get all Azure joined and registered devices
