@@ -85,4 +85,4 @@ check ROADRecon
 ## AzureBound
 - referenece https://hausec.com/2020/11/23/azurehound-cypher-cheatsheet/
 - reference https://github.com/BigFoxses/CARTP-cheatsheet/blob/main/customqueries.json 
-- reference 
+- reference [neo4j console query]
