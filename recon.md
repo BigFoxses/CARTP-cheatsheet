@@ -73,4 +73,13 @@ python o365creeper.py -f list_of_emails.txt -o validemails.txt
 ```
 - Possible to use https://github.com/nyxgeek/onedrive_user_enum (Non-lab-tool)
 
+## ADROAD Recon
+
+https://github.com/dirkjanm/ROADtools/wiki/Getting-started-with-ROADrecon
+``` 
+check ROADRecon 
+```
+
+## AzureBound
+- referenece https://hausec.com/2020/11/23/azurehound-cypher-cheatsheet/
 
