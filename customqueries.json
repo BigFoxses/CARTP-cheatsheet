@@ -46,11 +46,47 @@
             ]
         },
 	    	{
-            "name": "Find Owners of Azure Groups",
+            "name": "Return All On-premise users with edges to Azure",
             "queryList": [
                 {
                     "final": true,
                     "query": "MATCH  p=(m:User)-[r:AZResetPassword|AZOwns|AZUserAccessAdministrator|AZContributor|AZAddMembers|AZGlobalAdmin|AZVMContributor|AZOwnsAZAvereContributor]->(n) WHERE m.objectid CONTAINS 'S-1-5-21' RETURN p"
+                }
+            ]
+        },
+	      	{
+            "name": "Find all privileged Service Principals",
+            "queryList": [
+                {
+                    "final": true,
+                    "query": "MATCH p = (g:AZServicePrincipal)-[r]->(n) RETURN p"
+                }
+            ]
+        },
+	       	{
+            "name": "Find all Owners of Azure applications",
+            "queryList": [
+                {
+                    "final": true,
+                    "query": "MATCH p = (n)-[r:AZOwns]->(g:AZApp) RETURN p"
+                }
+            ]
+        },
+	      	{
+            "name": "Find All Azure users and their Groups",
+            "queryList": [
+                {
+                    "final": true,
+                    "query": "MATCH p=(m:AZUser)-[r:MemberOf]->(n) WHERE NOT m.objectid CONTAINS 'S-1-5' RETURN p"
+                }
+            ]
+        },
+	         	{
+            "name": "Find All Principals with the 'Contributor' role",
+            "queryList": [
+                {
+                    "final": true,
+                    "query": "MATCH p = (n)-[r:AZContributor]->(g) RETURN p"
                 }
             ]
         },
