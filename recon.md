@@ -83,6 +83,6 @@ check ROADRecon
 ```
 
 ## AzureBound
-- referenece https://hausec.com/2020/11/23/azurehound-cypher-cheatsheet/
-- reference https://github.com/BigFoxses/CARTP-cheatsheet/blob/main/customqueries.json 
-- reference https://github.com/BigFoxses/CARTP-cheatsheet/blob/main/neo4j%20console%20query
+- referenece [cheatcheat](https://hausec.com/2020/11/23/azurehound-cypher-cheatsheet/)
+- reference [AzureBound custom queries](/blob/main/customqueries.json) 
+- reference [neoj4 console](/blob/main/neo4j%20console%20query)
