@@ -86,3 +86,23 @@ check ROADRecon
 - referenece [cheatcheat](https://hausec.com/2020/11/23/azurehound-cypher-cheatsheet/)
 - reference [AzureBound custom queries](/blob/main/customqueries.json) 
 - reference [neoj4 console](/blob/main/neo4j%20console%20query)
+
+
+## PowerZure
+
+Getting Started
+An overview of Azure, Azure AD, and PowerZure is covered in my blog post here https://posts.specterops.io/attacking-azure-azure-ad-and-introducing-powerzure-ca70b330511a
+
+To get started with PowerZure, make sure the requirements are met. If you do not have the Az Module, PowerZure will ask you if you’d like to install it automatically when importing PowerZure as a module. PowerZure does require an Administrative PowerShell window, >= version 5.0. There is no advantage to running PowerZure on a compromised/pwned machine. Since you’re interacting with the cloud, it’s opsec safe to use from a bastion operating host, or if you’re feeling adventurous, your own host. Read the operational usage page here
+
+Additionally, you must sign-in to Azure before PowerZure functions are made available. To sign in, use the cmdlet
+
+Connect-AzAccount
+Once you are signed in to Azure, you can import PowerZure:
+
+ipmo C:\Path\To\Powerzure.psd1
+Upon importing, it will list your current role and available subscriptions. From there, you can run
+
+Get-AzureTarget
+To get a list of resources you have access to.
+
