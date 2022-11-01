@@ -30,6 +30,7 @@
 - Azure Resource manager (ARM)
   - It is the client neutral deployment and management service for Azure that is used for lifecycle management (creating, updating and deleting) and access control of of resources.
   - ARM templates can be used for consistent and dependency-defined redeployment of resources.
+
 - Azure RBAC Roles
   - Owner: Full access to all resources and can manage access for other users.
   - Contributor: Full access to all resources, cannot manage access.
@@ -72,3 +73,6 @@
  
  - Managed Identiy -> equivalent to AWS instance Profile /Lambda - exeuction roles -> retrive IMDS 169.254.169.254  
  - VM - Managed Identity-> Abuse UserData -> upload 
+
+  ## AdminstrationUnit
+  - An administrative unit is an Azure AD resource that can be a container for other Azure AD resources. An administrative unit can contain only users, groups, or devices. Administrative units restrict permissions in a role to any portion of your organization that you define. 
