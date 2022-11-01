@@ -178,6 +178,12 @@ Get-AzureADUser -SearchString 'test' | Get-AzureADUserMembership
 Get-AzureADUserMembership -ObjectId test@defcorphq.onmicrosoft.com
 ```
 
+### Get groups and roles of all users
+
+```
+Get-AzureADUser -all $true | % { if ($_.userType -eq "Member") { $_.DisplayName; Get-AzureADUserMembership -ObjectId $_.objectId  }}
+```
+
 #### Usefull group + member script
 ```
 $roleUsers = @() 
