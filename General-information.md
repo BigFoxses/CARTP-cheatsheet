@@ -58,17 +58,17 @@
   
   ### AAD ROLE
   
-  Global Administrator - AAD role -> need to switch to User Adminstration for Azure RM 
-  Application Authenticator => reset password of others
-  Contributor  (Azure RM) -> modify the resource but not prermission 
-  Intune Administrator => execute runBook @ system priv)  (Powershell script, program) against AADJ devices
-  VM adminstrator -> execute VM command (run system privilege)
+  - Global Administrator - AAD role -> need to switch to User Adminstration for Azure RM 
+  - Application Authenticator => reset password of others
+  - Contributor  (Azure RM) -> modify the resource but not prermission 
+  - Intune Administrator => execute runBook @ system priv)  (Powershell script, program) against AADJ devices
+  - VM adminstrator -> execute VM command (run system privilege)
   
-  Managed Identity - AAD object
-  Application - AAD object
-  Service Principal - AAD object
+  - Managed Identity - AAD object
+  - Application - AAD object
+  - Service Principal - AAD object
  
   
  
- Managed Identiy -> equivalent to AWS instance Profile /Lambda - exeuction roles -> retrive IMDS 169.254.169.254  
- VM - Managed Identity-> Abuse UserData -> upload 
+ - Managed Identiy -> equivalent to AWS instance Profile /Lambda - exeuction roles -> retrive IMDS 169.254.169.254  
+ - VM - Managed Identity-> Abuse UserData -> upload 
