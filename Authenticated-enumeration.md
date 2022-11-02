@@ -945,6 +945,8 @@ Connect-AzureAD -AccountId <ID> -AadAccessToken $token -TenantId <TENANT ID>
 - Let's have a look at super simple PowerShell codes for using the APIs
 
 #### Get an access token and use it with ARM API. For example, list all the subscriptions
+
+this is equivalent to Get-AzRoleAssignment 
 ```
 $Token = 'eyJ0eXAi..'
 $URI = 'https://management.azure.com/subscriptions?api-version=2020-01-01'
@@ -957,6 +959,32 @@ Headers = @{
 }
 (Invoke-RestMethod @RequestParams).value
 ```
+
+```
+$Token = 'eyJ0eXAi..'
+$URI = 'https://management.azure.com/subscriptions/<sub-id>/resources?api-version=2020-10-01'
+$RequestParams = @{
+Method = 'GET'
+Uri = $URI
+Headers = @{
+'Authorization' = "Bearer $Token"
+}
+}
+(Invoke-RestMethod @RequestParams).value
+```
+check the scope role
+$Token = 'eyJ0eXAi..'
+$URI = 'https://management.azure.com/subscriptions/<sub-id>/resourceGroups/<resource grp>/Providers/Microsoft.xxx.xx/providers/Microsoft.Authorization/permissions?api-version=2005-07-01'
+$RequestParams = @{
+Method = 'GET'
+Uri = $URI
+Headers = @{
+'Authorization' = "Bearer $Token"
+}
+}
+(Invoke-RestMethod @RequestParams).value
+```
+
 
 #### Get an access token for MS Graph. For example, list all the users
 ```
