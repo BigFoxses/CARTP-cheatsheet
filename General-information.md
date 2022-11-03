@@ -27,7 +27,31 @@
   - Managed Identity uses Azure AD tokens to access other resources (like key vaults, storage accounts) that support Azure AD authentication. 
   - It is a service principal of special type that can be used with Azure resources. 
   - Managed Identity can be system-assigned (tied to a resource and cannot be shared with other resources) or user-assigned (independent life cycle and can be share across resources).
-- Azure Resource manager (ARM)
+- Service Principal
+  - What’s an Azure Service Principal and Managed Identity?
+  - March 22, 2019 in Azure. In this post, we’ll take a brief look at the difference between an Azure service principal and a managed identity (formerly referred to as a Managed Service Identity or MSI).
+  - What is a service principal or managed service identity?
+     - Lets get the basics out of the way first. In short, a service principal can be defined as:
+     - An application whose tokens can be used to authenticate and grant access to specific Azure resources from a user-app, service or automation tool, when an organisation is using Azure Active Directory.
+     - In essence, service principals help us avoid having to create fake users in Active Directory in order to manage authentication when we need to access Azure resources.
+     - Stepping back a bit, and its important to remember that service principals are defined on a per-tenant basis. This is different to the application in which principals are created – the application sits across every tenant.
+     - Managed identities are often spoken about when talking about service principals, and that’s because its now the preferred approach to managing identities for apps and automation access. In effect, a managed identity is a layer on top of a service principal, removing the need for you to manually create and manage service principals directly.
+     - There are two types of managed identities:
+        - System-assigned: These identities are tied directly to a resource, and abide by that resources’ lifecycle. For instance, if that resource is deleted then the identity too will be removed
+        - User-assigned: These identities are created independent of a resource, and as such can be used between different resources. Removing them is a manual process whenever you see fit
+     - One of the problems with managed identities is that for now only a limited subset of Azure services support using them as an authentication mechanism. If the service you use doesn’t support MI, then you’ll need to either continue to manually create your service/security principals.
+     - So what’s the difference?
+         - Put simply, the difference between a managed identity and a service principal is that a managed identity manages the creation and automatic renewal of a service principal on your behalf. An Azure service principle is like an application, whose tokens can be used by other azure resources to authenticate and grant access to azure resources. Managed identities are service principals of a special type, which are locked to only be used with Azure resources. The main difference between both is that in managed identity you don’t need to specify any credentials in your code compared to service principles where you need to specify application id, client id, etc to generate a token to access any Azure resource. Ideally, you should opt for service principal only if the service you use doesn’t support managed identity.
+
+ - Azure Resource manager (ARM)
+  
+ An Azure service principle is like an application, whose tokens can be used by other azure resources to authenticate and grant access to azure resources.
+
+Managed identities are service principals of a special type, which are locked to only be used with Azure resources.
+
+The main difference between both is that in managed identity you don’t need to specify any credentials in your code compared to service principles where you need to specify application id, client id, etc to generate a token to access any Azure resource. Ideally, you should opt for service principal only if the service you use doesn’t support managed identity.
+  
+  
   - It is the client neutral deployment and management service for Azure that is used for lifecycle management (creating, updating and deleting) and access control of of resources.
   - ARM templates can be used for consistent and dependency-defined redeployment of resources.
 
