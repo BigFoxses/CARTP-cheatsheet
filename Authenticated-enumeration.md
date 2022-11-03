@@ -9,7 +9,7 @@
   * [Administrative-unit Enumeration](#Administrative-unit-enumeration)
   * [App enumeration](#App-enumeration)
   * [Service-principals enumeration](#Service-principals-enumeration)
-  * [storage-key enumeration](#storage key enumeration via VM managed Identity)
+  * [Storage key enumeration](#Storage-key-enumeration)
 * [Enumeration using Az powershell](#Enumeration-using-Az-powershell)
   * [Available resources](#Available-resources)
   * [Roles](#Roles)
@@ -364,8 +364,7 @@ Get-AzureADServicePrincipal -ObjectId <ID> | Get-AzureADServicePrincipalOwnedObj
 Get-AzureADServicePrincipal -ObjectId <ID> | Get-AzureADServicePrincipalCreatedObject
 ```
 
-### storage key enumeration via VM managed Identity
-```
+### Storage key enumeration
  #---------Get OAuth Token---------#
     if ($ArmToken -eq ''){
         $response = Invoke-WebRequest -Uri 'http://169.254.169.254/metadata/identity/oauth2/token?api-version=2018-02-01&resource=https://management.azure.com/' -Method GET -Headers @{Metadata="true"} -UseBasicParsing
